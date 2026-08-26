@@ -1,9 +1,1 @@
-{
-  "version": 2,
-  "builds": [
-    { "src": "南岗收入管理驾驶舱.html", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/南岗收入管理驾驶舱.html" }
-  ]
-}
+
