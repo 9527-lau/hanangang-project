@@ -175,6 +175,8 @@ body{
   border:1px solid var(--border);margin:0 14px 14px;border-radius:10px}
 .dc-status-left,.dc-status-right{display:flex;align-items:center;gap:10px}
 .dc-date{font-size:16px;font-weight:700;color:var(--cyan)}
+.dc-date-picker{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:15px;font-weight:700;color:var(--cyan);font-family:inherit;cursor:pointer;outline:none;color-scheme:dark}
+.dc-date-picker:hover{border-color:var(--cyan)}
 .dc-status-text{font-size:13px;font-weight:600}
 .dc-status-divider{color:rgba(122,156,198,.3);margin:0 4px}
 .dc-status-label{font-size:12px;color:var(--sub)}
@@ -472,11 +474,11 @@ body{
         <span class="dc-clock" id="dcClock">--:--:--</span>
         <span class="dc-status-divider">|</span>
         <span class="dc-status-label">日期</span>
-        <span class="dc-date" id="dcDate">--</span>
+        <input type="date" id="dcDatePicker" class="dc-date-picker" onchange="changeDate(this.value)">
       </div>
       <div class="dc-status-right">
         <span class="dc-status-label">下次刷新</span>
-        <span class="dc-status-value" id="dcRefresh">60s</span>
+        <span class="dc-status-value" id="dcRefresh">180s</span>
         <span class="dc-status-divider">|</span>
         <span class="dc-status-label">录入人数</span>
         <span class="dc-status-value" id="dcInputCount">0</span>
@@ -504,6 +506,10 @@ body{
         <div class="dc-summary-icon red"><span>!</span></div>
         <div><div class="dc-summary-text">未录入五级网格</div><div class="dc-summary-num v-red" id="dcSum5NoInput">0</div></div>
       </div>
+      <div class="dc-summary-card">
+        <div class="dc-summary-icon green"><span>√</span></div>
+        <div><div class="dc-summary-text">四级闭合天数</div><div class="dc-summary-num v-green" id="dcSum4Closure">0</div></div>
+      </div>
     </div>
 
     <!-- KPI卡片行 -->
@@ -526,7 +532,7 @@ body{
       <div class="panel-title"><span class="icon"></span>18个四级网格日完成排名</div>
       <div class="dc-table-wrap">
         <table class="dc-table">
-          <thead><tr><th>排名</th><th>四级网格</th><th>日目标(元)</th><th>今日完成(元)</th><th>闭合率</th><th>差额(元)</th><th>录入五级数</th><th>状态</th></tr></thead>
+          <thead><tr><th>排名</th><th>四级网格</th><th>日目标(元)</th><th>今日完成(元)</th><th>闭合率</th><th>差额(元)</th><th>录入五级数</th><th>闭合天数</th><th>状态</th></tr></thead>
           <tbody id="dc4Table"></tbody>
         </table>
       </div>
@@ -809,7 +815,7 @@ function closeDrill(){
 // ========== 日闭合监控 ==========
 var DAILY = {"meta":{"年度":2026,"日总目标":13282,"月增收总目标":398458,"分配依据":"基础合计时序缺口","录入码号":["单C新增","单宽新增","副卡新增","融合新增","融合FTTR","融合提值美好家"]},"codes":{"单C新增":{"ARPU":39},"单宽新增":{"ARPU":60},"副卡新增":{"ARPU":10},"融合新增":{"ARPU":99},"融合FTTR":{"ARPU":130},"融合提值美好家":{"ARPU":30}},"level4":{"城市网格1":{"名称":"网格1-李倩蔚","时序缺口":-24,"abs_gap":24,"日目标":854,"分配比例":6.43},"城市网格2":{"名称":"网格2-王宇","时序缺口":-25,"abs_gap":25,"日目标":892,"分配比例":6.72},"城市网格3":{"名称":"网格3-吴志明","时序缺口":-26,"abs_gap":26,"日目标":910,"分配比例":6.85},"城市网格4":{"名称":"网格4-宋贝贝","时序缺口":-24,"abs_gap":24,"日目标":857,"分配比例":6.45},"城市网格5":{"名称":"网格5-韩雪","时序缺口":-22,"abs_gap":22,"日目标":779,"分配比例":5.87},"城市网格6":{"名称":"网格6-于浩","时序缺口":-11,"abs_gap":11,"日目标":397,"分配比例":2.99},"城市网格7":{"名称":"网格7-徐树丹","时序缺口":-20,"abs_gap":20,"日目标":722,"分配比例":5.43},"城市网格8":{"名称":"网格8-赵慧媛","时序缺口":-18,"abs_gap":18,"日目标":637,"分配比例":4.8},"城市网格9":{"名称":"网格9-范思佳","时序缺口":-18,"abs_gap":18,"日目标":638,"分配比例":4.8},"城市网格10":{"名称":"网格10-王晓影","时序缺口":-17,"abs_gap":17,"日目标":612,"分配比例":4.61},"城市网格11":{"名称":"网格11-郭丰","时序缺口":-18,"abs_gap":18,"日目标":633,"分配比例":4.77},"城市网格12":{"名称":"网格12-高山珊","时序缺口":-20,"abs_gap":20,"日目标":703,"分配比例":5.29},"城市网格13":{"名称":"网格13-王宇","时序缺口":-25,"abs_gap":25,"日目标":876,"分配比例":6.6},"城市网格14":{"名称":"网格14-王艳丽","时序缺口":-21,"abs_gap":21,"日目标":755,"分配比例":5.69},"城市网格15":{"名称":"网格15-徐树丹","时序缺口":-19,"abs_gap":19,"日目标":687,"分配比例":5.17},"城市网格16":{"名称":"网格16-回志明","时序缺口":-28,"abs_gap":28,"日目标":990,"分配比例":7.46},"城市网格17":{"名称":"网格17-薛洪亮","时序缺口":-19,"abs_gap":19,"日目标":671,"分配比例":5.05},"农村网格":{"名称":"农村-汪琪","时序缺口":-19,"abs_gap":19,"日目标":669,"分配比例":5.03}},"level5":{"城市网1星城":{"名称":"网格1星城-李倩蔚","所属四级":"城市网格1","日目标":30},"城市网1瑞景":{"名称":"网格1瑞景-鄂薇","所属四级":"城市网格1","日目标":139},"城市网1炉具":{"名称":"网格1炉具-林相男","所属四级":"城市网格1","日目标":192},"城市网1延兴":{"名称":"网格1延兴-金丙成","所属四级":"城市网格1","日目标":94},"城市网1保利":{"名称":"网格1保利-王延刚","所属四级":"城市网格1","日目标":173},"城市网1七零":{"名称":"网格1七零-桑志勇","所属四级":"城市网格1","日目标":76},"城市网1红星":{"名称":"网格1红星-李宇","所属四级":"城市网格1","日目标":150},"城市网2尚熙":{"名称":"网格2尚熙-王宇","所属四级":"城市网格2","日目标":36},"城市网2君御":{"名称":"网格2君御-高百玲","所属四级":"城市网格2","日目标":169},"城市网2万达":{"名称":"网格2万达-李娜","所属四级":"城市网格2","日目标":256},"城市网2爱辉":{"名称":"网格2爱辉-陈超","所属四级":"城市网格2","日目标":186},"城市网2君庭":{"名称":"网格2君庭-岳晓双","所属四级":"城市网格2","日目标":147},"城市网2凯峯":{"名称":"网格2凯峯-张东方","所属四级":"城市网格2","日目标":98},"城市网3西典":{"名称":"网格3西典-孙海波","所属四级":"城市网格3","日目标":416},"城市网3庭院":{"名称":"网格3庭院-吴志明","所属四级":"城市网格3","日目标":81},"城市网3千兆":{"名称":"网格3千兆-孙海波","所属四级":"城市网格3","日目标":154},"城市网3爱达":{"名称":"网格3爱达-孙海波","所属四级":"城市网格3","日目标":259},"城市网4九溪":{"名称":"网格4九溪-李首强","所属四级":"城市网格4","日目标":203},"城市网4新地":{"名称":"网格4新地-张志强","所属四级":"城市网格4","日目标":175},"城市网4壹品":{"名称":"网格4壹品-刘晓宇","所属四级":"城市网格4","日目标":222},"城市网4涧桥":{"名称":"网格4涧桥-宋贝贝","所属四级":"城市网格4","日目标":90},"城市网4纳帕":{"名称":"网格4纳帕-宋贝贝","所属四级":"城市网格4","日目标":167},"城市网5九里":{"名称":"网格5九里-马长龙","所属四级":"城市网格5","日目标":185},"城市网5阳光":{"名称":"网格5阳光-李延龙","所属四级":"城市网格5","日目标":390},"城市网5雅筑":{"名称":"网格5雅筑-于国洋","所属四级":"城市网格5","日目标":99},"城市网5中海":{"名称":"网格5中海-韩雪","所属四级":"城市网格5","日目标":105},"城市网13人和":{"名称":"网格13人和-孙庆涛","所属四级":"城市网格13","日目标":126},"城市网13革新":{"名称":"网格13革新-吴修文","所属四级":"城市网格13","日目标":89},"城市网13国民":{"名称":"网格13国民-姜海鑫","所属四级":"城市网格13","日目标":158},"城市网13辽阳":{"名称":"网格13辽阳-赵虹","所属四级":"城市网格13","日目标":141},"城市网13一曼":{"名称":"网格13一曼-庄威","所属四级":"城市网格13","日目标":154},"城市网13邮政":{"名称":"网格13邮政-庄威","所属四级":"城市网格13","日目标":100},"城市网13巴陵":{"名称":"网格13巴陵-孙庆涛","所属四级":"城市网格13","日目标":108},"城市网7鲁商":{"名称":"网格7鲁商-丁岩","所属四级":"城市网格7","日目标":128},"城市网7凤凰":{"名称":"网格7凤凰-谷月","所属四级":"城市网格7","日目标":184},"城市网7未来":{"名称":"网格7未来-李松","所属四级":"城市网格7","日目标":105},"城市网7哈药":{"名称":"网格7哈药-周伟鹏","所属四级":"城市网格7","日目标":128},"城市网7英伦":{"名称":"网格7英伦-宫继超","所属四级":"城市网格7","日目标":176},"城市网8大众":{"名称":"网格8大众-赵慧媛","所属四级":"城市网格8","日目标":60},"城市网8科府":{"名称":"网格8科府-任丹丹","所属四级":"城市网格8","日目标":230},"城市网8征仪":{"名称":"网格8征仪-胡博","所属四级":"城市网格8","日目标":188},"城市网8征跃":{"名称":"网格8征跃-赵海","所属四级":"城市网格8","日目标":159},"城市网9进化":{"名称":"网格9进化-付立梅","所属四级":"城市网格9","日目标":130},"城市网9苗圃":{"名称":"网格9苗圃-徐亮","所属四级":"城市网格9","日目标":185},"城市网9仪兴":{"名称":"网格9仪兴-范思佳","所属四级":"城市网格9","日目标":47},"城市网9康宁":{"名称":"网格9康宁-唐学武","所属四级":"城市网格9","日目标":125},"城市网9桥北":{"名称":"网格9桥北-张月","所属四级":"城市网格9","日目标":150},"城市网络10涵舍":{"名称":"哈尔滨市南岗城市网络-未知","所属四级":"城市网格10","日目标":116},"城市网10怡园":{"名称":"网格10怡园-姜鑫","所属四级":"城市网格10","日目标":68},"城市网10双兴":{"名称":"网格10双兴-柴袁明","所属四级":"城市网格10","日目标":114},"城市网10嘉禾":{"名称":"网格10嘉禾-王晓影","所属四级":"城市网格10","日目标":41},"城市网10师大":{"名称":"网格10师大-王瑶","所属四级":"城市网格10","日目标":101},"城市网10金博":{"名称":"网格10金博-刘静静","所属四级":"城市网格10","日目标":110},"城市网10科大":{"名称":"网格10科大-王禹","所属四级":"城市网格10","日目标":63},"城市网11松明":{"名称":"网格11松明-崔美西","所属四级":"城市网格11","日目标":65},"城市网11货栈":{"名称":"网格11货栈-邵德伦","所属四级":"城市网格11","日目标":88},"城市网11上方":{"名称":"网格11上方-黄魁","所属四级":"城市网格11","日目标":76},"城市网11海城":{"名称":"网格11海城-王嘉梅","所属四级":"城市网格11","日目标":49},"城市网11宏泽":{"名称":"网格11宏泽-王磊","所属四级":"城市网格11","日目标":133},"城市网11曲线":{"名称":"网格11曲线-邓友财","所属四级":"城市网格11","日目标":114},"城市网11铁瓦":{"名称":"网格11铁瓦-郭丰","所属四级":"城市网格11","日目标":109},"城市网12革新":{"名称":"网格12革新-刘湘南","所属四级":"城市网格12","日目标":141},"城市网12文林":{"名称":"网格12文林-朱启超","所属四级":"城市网格12","日目标":110},"城市网12文景":{"名称":"网格12文景-李司","所属四级":"城市网格12","日目标":71},"城市网12光芒":{"名称":"网格12光芒-刘旭","所属四级":"城市网格12","日目标":197},"城市网12文府":{"名称":"网格12文府-高山珊","所属四级":"城市网格12","日目标":93},"城市网12文海":{"名称":"网格12文海-朱启超","所属四级":"城市网格12","日目标":91},"城市网14军工":{"名称":"网格14军工-张富饶","所属四级":"城市网格14","日目标":145},"城市网14红星":{"名称":"网格14红星-王艳丽","所属四级":"城市网格14","日目标":111},"城市网14马端":{"名称":"网格14马端-李朝洲","所属四级":"城市网格14","日目标":165},"城市网14祥和":{"名称":"网格14祥和-李占军","所属四级":"城市网格14","日目标":140},"城市网14极乐":{"名称":"网格14极乐-王艳丽","所属四级":"城市网格14","日目标":75},"城市网14新发":{"名称":"网格14新发-张富饶","所属四级":"城市网格14","日目标":118},"城市网15黄河":{"名称":"网格15黄河-孟楠","所属四级":"城市网格15","日目标":73},"城市网15先锋":{"名称":"网格15先锋-徐树丹","所属四级":"城市网格15","日目标":43},"城市网15路园":{"名称":"网格15路园-王鑫","所属四级":"城市网格15","日目标":176},"城市网15芦家":{"名称":"网格15芦家-王鑫","所属四级":"城市网格15","日目标":164},"城市网15龙福":{"名称":"网格15龙福-赵明","所属四级":"城市网格15","日目标":70},"城市网15鼎鑫":{"名称":"网格15鼎鑫-薛方雨","所属四级":"城市网格15","日目标":159},"城市网16汉水":{"名称":"网格16汉水-刘明韬","所属四级":"城市网格16","日目标":59},"城市网16泰山":{"名称":"网格16泰山-卢金鑫","所属四级":"城市网格16","日目标":164},"城市网16鸿翔":{"名称":"网格16鸿翔-姜跃","所属四级":"城市网格16","日目标":119},"城市网16昆仑":{"名称":"网格16昆仑-徐招朋","所属四级":"城市网格16","日目标":110},"城市网16星河":{"名称":"网格16星河-徐招朋","所属四级":"城市网格16","日目标":158},"城市网16吉星":{"名称":"网格16吉星-回志明","所属四级":"城市网格16","日目标":112},"城市网16悦山":{"名称":"网格16悦山-张震","所属四级":"城市网格16","日目标":159},"城市网16宣庆":{"名称":"网格16宣庆-李德喜","所属四级":"城市网格16","日目标":109},"城市网17泰海":{"名称":"网格17泰海-蔺长乐","所属四级":"城市网格17","日目标":121},"城市网17信恒":{"名称":"网格17信恒-薛洪亮","所属四级":"城市网格17","日目标":118},"城市网17梧桐":{"名称":"网格17梧桐-薛洪亮","所属四级":"城市网格17","日目标":152},"城市网17麒麟":{"名称":"网格17麒麟-张远鹏","所属四级":"城市网格17","日目标":130},"城市网17裕赐":{"名称":"网格17裕赐-孟祥宇","所属四级":"城市网格17","日目标":88},"城市网17红新":{"名称":"网格17红新-孟祥宇","所属四级":"城市网格17","日目标":61},"城市网6电缆":{"名称":"网格6电缆-高蕊","所属四级":"城市网格6","日目标":109},"城市网6哈南":{"名称":"网格6哈南-李奇","所属四级":"城市网格6","日目标":83},"城市网6锦绣":{"名称":"网格6锦绣-于浩","所属四级":"城市网格6","日目标":69},"城市网6三环":{"名称":"网格6三环-贾妍","所属四级":"城市网格6","日目标":136},"农村网单元1-王岗1":{"名称":"农村王岗1-朱小元","所属四级":"农村网格","日目标":372},"农村网单元2-王岗2红旗":{"名称":"农村王岗2红旗-安尚楠","所属四级":"农村网格","日目标":297}}};
 var dcCharts = {};
-var dcRefreshCount = 60;
+var dcRefreshCount = 180;
 
 // ========== Supabase 云端配置 ==========
 // 部署后在下面填写你的 Supabase 项目地址和密钥
@@ -824,6 +830,105 @@ var SUPA_OK = (SUPA_URL && SUPA_URL !== 'YOUR_SUPABASE_URL' &&
 
 // 内存缓存：当天所有五级网格的录入数据（格式同旧 localStorage）
 var dayCache = {};
+var selectedDate = getTodayStr();
+var monthCache = {}; // 当月各日数据缓存: { "2026-08-01": { fiveKey: [records] }, ... }
+
+function getMonthStr(dateStr){
+  if(!dateStr)dateStr=selectedDate;
+  return dateStr.substring(0,7);
+}
+function getMonthDays(monthStr){
+  var p=monthStr.split('-');
+  return new Date(parseInt(p[0]),parseInt(p[1]),0).getDate();
+}
+function fetchMonthData(monthStr){
+  if(!monthStr)monthStr=getMonthStr();
+  var days=getMonthDays(monthStr);
+  if(!SUPA_OK){
+    monthCache={};
+    for(var d=1;d<=days;d++){
+      var ds=monthStr+'-'+String(d).padStart(2,'0');
+      var raw=localStorage.getItem(dcKey(ds));
+      if(raw)monthCache[ds]=JSON.parse(raw);
+    }
+    return Promise.resolve();
+  }
+  var startDay=monthStr+'-01';
+  var endDay=monthStr+'-'+String(days).padStart(2,'0');
+  return fetch(SUPA_URL+'/rest/v1/records?日期=gte.'+startDay+'&日期=lte.'+endDay+'&order=id.asc',{
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+  }).then(function(r){
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(rows){
+    monthCache={};
+    rows.forEach(function(r){
+      if(!monthCache[r.日期])monthCache[r.日期]={};
+      if(!monthCache[r.日期][r.five_key])monthCache[r.日期][r.five_key]=[];
+      monthCache[r.日期][r.five_key].push({_id:r.id,time:r.时间,hour:r.小时,codes:r.codes,revenue:r.收入});
+    });
+    // 合并本地兜底数据
+    for(var d=1;d<=days;d++){
+      var ds=monthStr+'-'+String(d).padStart(2,'0');
+      var raw=localStorage.getItem(dcKey(ds));
+      if(raw){
+        var local=JSON.parse(raw);
+        if(!monthCache[ds])monthCache[ds]={};
+        Object.keys(local).forEach(function(fk){
+          if(!local[fk])return;
+          local[fk].forEach(function(lr){
+            if(!monthCache[ds][fk])monthCache[ds][fk]=[];
+            var dup=monthCache[ds][fk].some(function(cr){return cr.time===lr.time&&cr.revenue===lr.revenue;});
+            if(!dup)monthCache[ds][fk].push(lr);
+          });
+        });
+      }
+    }
+  }).catch(function(e){
+    console.error('fetchMonth error:',e);
+    // 回退：从localStorage扫描
+    monthCache={};
+    for(var d=1;d<=days;d++){
+      var ds=monthStr+'-'+String(d).padStart(2,'0');
+      var raw=localStorage.getItem(dcKey(ds));
+      if(raw)monthCache[ds]=JSON.parse(raw);
+    }
+  });
+}
+function getFourClosureDays(fourKey){
+  var ms=getMonthStr();
+  var days=getMonthDays(ms);
+  var count=0;
+  var target=DAILY.level4[fourKey].日目标;
+  for(var d=1;d<=days;d++){
+    var ds=ms+'-'+String(d).padStart(2,'0');
+    var dd=monthCache[ds];
+    if(!dd)continue;
+    var rev=0;
+    Object.keys(DAILY.level5).forEach(function(fk){
+      if(DAILY.level5[fk].所属四级!==fourKey)return;
+      if(dd[fk])rev+=dd[fk].reduce(function(s,r){return s+r.revenue;},0);
+    });
+    if(rev>=target)count++;
+  }
+  return count;
+}
+function getFiveClosureDays(fiveKey){
+  var ms=getMonthStr();
+  var days=getMonthDays(ms);
+  var count=0;
+  var target=DAILY.level5[fiveKey].日目标;
+  for(var d=1;d<=days;d++){
+    var ds=ms+'-'+String(d).padStart(2,'0');
+    var dd=monthCache[ds];
+    if(!dd||!dd[fiveKey])continue;
+    var rev=dd[fiveKey].reduce(function(s,r){return s+r.revenue;},0);
+    if(rev>=target)count++;
+  }
+  return count;
+}
+
+function getTodayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 
 function getToday(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 
@@ -877,7 +982,7 @@ function loadDay(date){return dayCache;}
 
 // 获取某五级今日所有录入记录
 function getFiveRecords(fiveKey){
-  var day=loadDay(getToday());
+  var day=loadDay(selectedDate);
   if(!day[fiveKey])return [];
   return day[fiveKey];
 }
@@ -942,7 +1047,7 @@ function submitRecord(fiveKey,codes){
 // 删除录入记录（异步）
 function deleteRecord(fiveKey,idx){
   if(!SUPA_OK){
-    var today=getToday();
+    var today=getTodayStr();
     var day=loadDay(today);
     if(!day[fiveKey])return Promise.resolve();
     day[fiveKey].splice(idx,1);
@@ -990,7 +1095,7 @@ function getThreeRevenue(){
 
 // 计算每小时累计收入（三级）
 function getHourlyData(){
-  var today=getToday();
+  var today=selectedDate;
   var day=loadDay(today);
   var hours={};
   var currentHour=new Date().getHours();
@@ -1019,7 +1124,7 @@ function getHourlyData(){
 
 // 获取有录入的五级网格数
 function getInputCount(){
-  var today=getToday();
+  var today=selectedDate;
   var day=loadDay(today);
   return Object.keys(day).filter(function(k){return day[k]&&day[k].length>0;}).length;
 }
@@ -1076,7 +1181,7 @@ function renderV3(){
   var inputCount=getInputCount();
 
   // 状态栏
-  document.getElementById('dcDate').textContent=getToday();
+  document.getElementById('dcDatePicker').value=selectedDate;
   document.getElementById('dcInputCount').textContent=inputCount;
   var nextH=new Date().getHours()+1;
   document.getElementById('dcNextHour').textContent=String(nextH).padStart(2,'0')+':00';
@@ -1147,9 +1252,10 @@ function renderV3(){
     Object.keys(DAILY.level5).forEach(function(fk){
       if(DAILY.level5[fk].所属四级===k)totalFive++;
     });
-    rows.push({name:d.名称,target:d.日目标,rev:rev,rate:r,gap:d.日目标-rev,fiveInput:fiveCount,totalFive:totalFive});
+    rows.push({name:d.名称,target:d.日目标,rev:rev,rate:r,gap:d.日目标-rev,fiveInput:fiveCount,totalFive:totalFive,closure:getFourClosureDays(k)});
   });
   rows.sort(function(a,b){return b.rate-a.rate;});
+  var monthDays=getMonthDays(getMonthStr());
   var tHtml='';
   rows.forEach(function(r,i){
     var status=r.rate>=1?'green':(r.rate>=0.5?'orange':'red');
@@ -1162,6 +1268,7 @@ function renderV3(){
     tHtml+='<td class="'+rateClass(r.rate)+'">'+pct(r.rate)+'</td>';
     tHtml+='<td class="'+(r.gap>0?'v-red':'v-green')+'">'+fmt(r.gap)+'</td>';
     tHtml+='<td>'+r.fiveInput+'/'+r.totalFive+'</td>';
+    tHtml+='<td>'+r.closure+'/'+monthDays+'</td>';
     tHtml+='<td><span class="tag tag-'+status+'">'+statusText+'</span></td>';
     tHtml+='</tr>';
   });
@@ -1184,6 +1291,10 @@ function renderV3(){
     if(getFiveRevenue(k)===0)noInputCount++;
   });
   document.getElementById('dcSum5NoInput').textContent=noInputCount;
+  // 四级闭合天数汇总
+  var totalClosure=0;
+  rows.forEach(function(r){totalClosure+=r.closure;});
+  document.getElementById('dcSum4Closure').textContent=totalClosure;
 }
 
 // ========== 四级监控 ==========
@@ -1219,6 +1330,7 @@ function renderV4Detail(){
   var rev=getFourRevenue(fourKey);
   var rate=rev/d.日目标;
   var gap=d.日目标-rev;
+  var monthDays=getMonthDays(getMonthStr());
 
   var html='';
   // KPI
@@ -1226,7 +1338,13 @@ function renderV4Detail(){
   html+='<div class="dc-kpi-card"><div class="label">本级日目标</div><div class="value v-cyan">'+fmt(d.日目标)+' 元</div><div class="sub">分配比例'+d.分配比例+'%</div></div>';
   html+='<div class="dc-kpi-card"><div class="label">今日完成</div><div class="value v-blue">'+fmt(rev)+' 元</div><div class="sub">下属五级归集</div></div>';
   html+='<div class="dc-kpi-card"><div class="label">闭合率</div><div class="value '+rateClass(rate)+'">'+pct(rate)+'</div><div class="sub">目标'+fmt(d.日目标)+'元</div></div>';
+  var fiveTotalClosure=0;
+  Object.keys(DAILY.level5).forEach(function(k){
+    if(DAILY.level5[k].所属四级!==fourKey)return;
+    fiveTotalClosure+=getFiveClosureDays(k);
+  });
   html+='<div class="dc-kpi-card"><div class="label">差额</div><div class="value '+(gap>0?'v-red':'v-green')+'">'+fmt(gap)+' 元</div><div class="sub">距闭合目标</div></div>';
+  html+='<div class="dc-kpi-card"><div class="label">五级闭合天数</div><div class="value v-green">'+fiveTotalClosure+' 天</div><div class="sub">当月累计</div></div>';
   html+='</div>';
 
   // 下属五级排名表
@@ -1236,12 +1354,12 @@ function renderV4Detail(){
     var fd=DAILY.level5[k];
     var frev=getFiveRevenue(k);
     var fr=frev/fd.日目标;
-    fiveList.push({key:k,name:fd.名称,target:fd.日目标,rev:frev,rate:fr,gap:fd.日目标-frev,records:getFiveRecords(k).length});
+    fiveList.push({key:k,name:fd.名称,target:fd.日目标,rev:frev,rate:fr,gap:fd.日目标-frev,records:getFiveRecords(k).length,closure:getFiveClosureDays(k)});
   });
   fiveList.sort(function(a,b){return b.rate-a.rate;});
 
   html+='<div class="dc-panel" style="margin:0 14px 14px"><div class="panel-title"><span class="icon"></span>下属五级网格日完成排名</div>';
-  html+='<div class="dc-table-wrap"><table class="dc-table"><thead><tr><th>排名</th><th>五级网格</th><th>日目标(元)</th><th>今日完成(元)</th><th>闭合率</th><th>差额(元)</th><th>录入次数</th><th>状态</th></tr></thead><tbody>';
+  html+='<div class="dc-table-wrap"><table class="dc-table"><thead><tr><th>排名</th><th>五级网格</th><th>日目标(元)</th><th>今日完成(元)</th><th>闭合率</th><th>差额(元)</th><th>录入次数</th><th>闭合天数</th><th>状态</th></tr></thead><tbody>';
   fiveList.forEach(function(r,i){
     var status=r.rate>=1?'green':(r.rate>=0.5?'orange':'red');
     var statusText=r.rate>=1?'已闭合':(r.rate>=0.5?'关注':'预警');
@@ -1253,6 +1371,7 @@ function renderV4Detail(){
     html+='<td class="'+rateClass(r.rate)+'">'+pct(r.rate)+'</td>';
     html+='<td class="'+(r.gap>0?'v-red':'v-green')+'">'+fmt(r.gap)+'</td>';
     html+='<td>'+r.records+'</td>';
+    html+='<td>'+r.closure+'/'+monthDays+'</td>';
     html+='<td><span class="tag tag-'+status+'">'+statusText+'</span></td>';
     html+='</tr>';
   });
@@ -1438,9 +1557,13 @@ function startDcRefresh(){
   function update(){
     dcRefreshCount--;
     if(dcRefreshCount<=0){
-      dcRefreshCount=60;
+      dcRefreshCount=180;
+      // 查看历史日期时不自动刷新（只刷新今天）
+      if(selectedDate!==getTodayStr()){dcRefreshCount=180;return;}
       // 先从服务器拉取最新数据，再刷新当前视角
-      fetchDay(getToday()).then(function(){
+      fetchMonthData(getMonthStr()).then(function(){
+        return fetchDay(selectedDate);
+      }).then(function(){
         var activeView=document.querySelector('.view-content.active');
         if(activeView){
           if(activeView.id==='v3')renderV3();
@@ -1460,13 +1583,56 @@ function startDcRefresh(){
 }
 
 // 初始化日闭合监控
+// 自动清理上月数据（只保留当月）
+function cleanOldRecords(){
+  if(!SUPA_OK)return;
+  var now=new Date();
+  var curYear=now.getFullYear();
+  var curMonth=now.getMonth()+1;
+  var monthStart=curYear+'-'+String(curMonth).padStart(2,'0')+'-01';
+  // 删除当月1号之前的所有数据
+  fetch(SUPA_URL+'/rest/v1/records?日期=lt.'+monthStart,{
+    method:'DELETE',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+  }).then(function(r){
+    if(r.ok){console.log('旧数据清理完成(<' + monthStart + ')');}
+  }).catch(function(e){console.error('清理旧数据失败:',e);});
+}
+
+// 切换日期：加载指定日期数据并重新渲染
+function changeDate(dateStr){
+  if(!dateStr)return;
+  selectedDate=dateStr;
+  var isToday=(dateStr===getTodayStr());
+  var refreshEl=document.getElementById('dcRefresh');
+  if(refreshEl)refreshEl.textContent=isToday?'180s':'手动';
+  renderV3();
+  var newMonth=getMonthStr(selectedDate);
+  fetchMonthData(newMonth).then(function(){
+    renderV3();
+    fetchDay(selectedDate).then(function(){
+      renderV3();
+      var activeView=document.querySelector('.view-content.active');
+      if(activeView){
+        if(activeView.id==='v4')renderV4Detail();
+        else if(activeView.id==='v5')renderV5Detail();
+      }
+    });
+  });
+}
+
 function initDailyClosure(){
   startDcClock();
   startDcRefresh();
-  // 先从服务器拉取数据，再渲染
-  renderV3(); // 先用空缓存渲染（显示0值）
-  fetchDay(getToday()).then(function(){
-    renderV3(); // 拉取完成后重新渲染
+  cleanOldRecords();
+  var dp=document.getElementById('dcDatePicker');
+  if(dp)dp.value=getTodayStr();
+  renderV3();
+  fetchMonthData(getMonthStr()).then(function(){
+    renderV3();
+    fetchDay(getTodayStr()).then(function(){
+      renderV3();
+    });
   });
 }
 
