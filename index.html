@@ -840,12 +840,31 @@ function fetchDay(date){
   }
   return fetch(SUPA_URL+'/rest/v1/records?date=eq.'+date+'&order=id.asc',{
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-  }).then(function(r){return r.json();}).then(function(rows){
+  }).then(function(r){
+    if(!r.ok){throw new Error('HTTP '+r.status);}
+    return r.json();
+  }).then(function(rows){
     dayCache={};
     rows.forEach(function(r){
       if(!dayCache[r.five_key])dayCache[r.five_key]=[];
       dayCache[r.five_key].push({_id:r.id,time:r.time,hour:r.hour,codes:r.codes,revenue:r.revenue});
     });
+    // 合并本地兜底数据（云端写入失败时保存在localStorage的记录），避免数据丢失
+    try{
+      var raw=localStorage.getItem(dcKey(date));
+      if(raw){
+        var local=JSON.parse(raw);
+        Object.keys(local).forEach(function(fk){
+          if(!local[fk])return;
+          local[fk].forEach(function(lr){
+            if(!dayCache[fk])dayCache[fk]=[];
+            // 简单去重：云端已有相同 time+revenue 则跳过
+            var dup=dayCache[fk].some(function(cr){return cr.time===lr.time&&cr.revenue===lr.revenue;});
+            if(!dup)dayCache[fk].push(lr);
+          });
+        });
+      }
+    }catch(e3){console.error('merge local error:',e3);}
   }).catch(function(e){
     console.error('fetchDay error:',e);
     var raw=localStorage.getItem(dcKey(date));
@@ -896,14 +915,27 @@ function submitRecord(fiveKey,codes){
     method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
     body:JSON.stringify({date:getToday(),five_key:fiveKey,time:record.time,hour:record.hour,codes:record.codes,revenue:record.revenue})
-  }).then(function(r){return r.json();}).then(function(rows){
+  }).then(function(r){
+    if(!r.ok){throw new Error('HTTP '+r.status);}
+    return r.json();
+  }).then(function(rows){
     if(rows&&rows.length>0){record._id=rows[0].id;}
     if(!dayCache[fiveKey])dayCache[fiveKey]=[];
     dayCache[fiveKey].push(record);
     return true;
   }).catch(function(e){
     console.error('submit error:',e);
-    return false;
+    // 兜底：云端写入失败时保存到 localStorage，避免数据丢失（下次fetchDay会尝试云端，本地作为离线备份）
+    try{
+      var today=getToday();
+      var day=loadDay(today);
+      if(!day[fiveKey])day[fiveKey]=[];
+      day[fiveKey].push(record);
+      saveDay(today,day);
+      if(!dayCache[fiveKey])dayCache[fiveKey]=[];
+      dayCache[fiveKey].push(record);
+    }catch(e2){console.error('local fallback error:',e2);return false;}
+    return true;
   });
 }
 
