@@ -105,6 +105,10 @@ body{
   margin-bottom:12px;display:flex;align-items:center;gap:8px;
 }
 .panel-title .icon{width:4px;height:16px;background:var(--cyan);border-radius:2px}
+.panel-title .drill-btn{margin-left:auto;font-size:12px;color:var(--cyan);cursor:pointer;
+  background:rgba(64,158,255,.12);border:1px solid rgba(64,158,255,.35);border-radius:6px;
+  padding:3px 12px;transition:all .3s;font-weight:500}
+.panel-title .drill-btn:hover{background:rgba(64,158,255,.3);color:#fff}
 .panel-body{flex:1;position:relative;min-height:240px}
 /* KPI卡片 */
 .kpi-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
@@ -398,7 +402,7 @@ body{
 <div class="dashboard">
   <!-- 第一行：概览区域 -->
   <div class="panel" id="panel-overview">
-    <div class="panel-title"><span class="icon"></span>业绩总览</div>
+    <div class="panel-title"><span class="icon"></span>业绩总览<span class="drill-btn" onclick="showDrill('overview')">钻取</span></div>
     <div class="panel-body">
       <div class="kpi-row" id="kpiOverview"></div>
       <div id="chartOverview" class="chart" style="height:200px"></div>
@@ -406,14 +410,14 @@ body{
   </div>
 
   <div class="panel" id="panel-distribution">
-    <div class="panel-title"><span class="icon"></span>业务分布</div>
+    <div class="panel-title"><span class="icon"></span>业务分布<span class="drill-btn" onclick="showDrill('dist')">钻取</span></div>
     <div class="panel-body">
       <div id="chartDistribution" class="chart" style="height:280px"></div>
     </div>
   </div>
 
   <div class="panel" id="panel-timeline">
-    <div class="panel-title"><span class="icon"></span>时间维度</div>
+    <div class="panel-title"><span class="icon"></span>时间维度<span class="drill-btn" onclick="showDrill('timeline')">钻取</span></div>
     <div class="panel-body">
       <div id="chartTimeline" class="chart" style="height:280px"></div>
     </div>
@@ -421,7 +425,7 @@ body{
 
   <!-- 第二行：详细分析区域 -->
   <div class="panel" id="panel-fusion">
-    <div class="panel-title"><span class="icon"></span>融合收入分析</div>
+    <div class="panel-title"><span class="icon"></span>融合收入分析<span class="drill-btn" onclick="showDrill('fusion')">钻取</span></div>
     <div class="panel-body">
       <div class="kpi-row" id="kpiFusion"></div>
       <div id="chartFusion" class="chart" style="height:220px"></div>
@@ -429,7 +433,7 @@ body{
   </div>
 
   <div class="panel" id="panel-singleC">
-    <div class="panel-title"><span class="icon"></span>单C收入分析</div>
+    <div class="panel-title"><span class="icon"></span>单C收入分析<span class="drill-btn" onclick="showDrill('singleC')">钻取</span></div>
     <div class="panel-body">
       <div class="kpi-row" id="kpiSingleC"></div>
       <div id="chartSingleC" class="chart" style="height:220px"></div>
@@ -437,7 +441,7 @@ body{
   </div>
 
   <div class="panel" id="panel-steps">
-    <div class="panel-title"><span class="icon"></span>台阶收入分析</div>
+    <div class="panel-title"><span class="icon"></span>台阶收入分析<span class="drill-btn" onclick="showDrill('steps')">钻取</span></div>
     <div class="panel-body">
       <div class="kpi-row" id="kpiSteps"></div>
       <div id="chartSteps" class="chart" style="height:220px"></div>
@@ -773,9 +777,10 @@ function switchBiz(){
 }
 
 function showDrill(type){
+  var typeNames={'overview':'业绩总览','dist':'业务分布','timeline':'时间维度','fusion':'融合收入分析','singleC':'单C收入分析','steps':'台阶收入分析'};
   document.getElementById('drillOverlay').classList.add('show');
   document.getElementById('drillPanel').classList.add('show');
-  document.getElementById('drillTitle').textContent='钻取：'+currentBiz+' - '+type;
+  document.getElementById('drillTitle').textContent='钻取：'+currentBiz+' - '+(typeNames[type]||type);
   var L4=COCKPIT['level4'];
   var html='<table class="mini-table"><tr><th>四级网格</th><th>台阶目标</th><th>台阶累计</th><th>台阶完成率</th><th>基础目标</th><th>基础累计</th><th>基础完成率</th></tr>';
   Object.keys(L4).forEach(function(n){
